@@ -1,0 +1,91 @@
+create database  moviesdb;
+CREATE TABLE movies (
+  movie_id INT AUTO_INCREMENT PRIMARY KEY,
+  movie_title VARCHAR(255) NOT NULL,
+  language VARCHAR(50),
+  genre VARCHAR(50),
+  cast VARCHAR(255),
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+==============================================================================
+create database showdb;
+  CREATE TABLE theatre_partners (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    username VARCHAR(255) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    salt VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+  );
+
+INSERT INTO theatre_partners (name, username, password, salt)
+VALUES ('Theatre Partner 1', 'partner1', 'QWMN3LK0HG', 'slate');
+INSERT INTO theatre_partners (name, username, password, salt)
+VALUES ('Theatre Partner 2', 'partner2', 'KMJYHQ9*MNj', 'teals');
+
+CREATE TABLE theatres (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(255) NOT NULL,
+  location VARCHAR(255) NOT NULL,
+  seating_capacity INT,
+  partner_id INT NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (partner_id) REFERENCES theatre_partners (id)
+);
+
+
+CREATE TABLE showtimes (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  movie_id INT NOT NULL,
+  theatre_id INT NOT NULL,
+  start_time TIMESTAMP NOT NULL,
+  end_time TIMESTAMP NOT NULL,
+  available_seats INT NOT NULL,
+  day DATE NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (movie_id) REFERENCES moviesdb.movies (movie_id),
+  FOREIGN KEY (theatre_id) REFERENCES showdb.theatres (id)
+);
+
+=====================================================================================
+create database customers;
+CREATE TABLE users (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  username VARCHAR(255) NOT NULL,
+  email VARCHAR(255) NOT NULL,
+  password VARCHAR(255) NOT NULL,
+  salt VARCHAR(255) NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+=====================================================================================
+create database reservations;
+  CREATE TABLE bookings (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    showtime_id INT NOT NULL,
+    booking_date TIMESTAMP NOT NULL,
+    number_of_seats INT NOT NULL,
+    total_amount DECIMAL(10, 2) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES customers.users (id),
+    FOREIGN KEY (showtime_id) REFERENCES showdb.showtimes (id)
+  );
+
+=====================================================================================
+create database cinemas;
+CREATE TABLE seats (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  showtime_id INT NOT NULL,
+  seat_number VARCHAR(20) NOT NULL,
+  booking_id INT,
+  availability BOOLEAN NOT NULL DEFAULT true,
+  FOREIGN KEY (showtime_id) REFERENCES showdb.showtimes (id),
+  FOREIGN KEY (booking_id) REFERENCES reservations.bookings (id)
+);
