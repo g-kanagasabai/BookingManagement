@@ -1,3 +1,3 @@
 # BookingManagement
 
-Ticket Booking API with MySQL used as backend 
+Ticket Booking API with Java Spring Boot and MySQL
